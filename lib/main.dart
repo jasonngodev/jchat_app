@@ -20,7 +20,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:socket_io_client/socket_io_client.dart' as IO;
+import 'package:socket_io_client/socket_io_client.dart';
 
 void main() => runApp(MaterialApp(
       home: MyApp(),
@@ -34,11 +34,13 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  IO.Socket socket = IO.io('http://localhost:5050', <String, dynamic>{
-    'transports': ['websocket'],
-    'autoConnect': true,
-    'allowUpgrades': false
-  });
+  // IO.Socket socket = IO.io('http://localhost:5050', <String, dynamic>{
+  //   'transports': ['websocket'],
+  //   'autoConnect': true,
+  //   'allowUpgrades': false
+  // });
+
+  Socket socket = io('http://127.0.0.1:5050');
 
 //   const List EVENTS = [
 //   'connect',
@@ -56,29 +58,52 @@ class _MyAppState extends State<MyApp> {
 //   'pong'
 // ];
 
-  _MyAppState() {
-    print('called');
-    // socket.on('connect', (_) {
-    //   print('connect');
-    //   socket.emit('msg', 'test');
-    // });
-    socket.onConnect((data) => print('Connected'));
-    //socket.connect();
-    socket.onConnecting((data) {
-      print("Connecting");
-    });
-    socket.on('event', (data) => print(data));
-    // socket.on('disconnect', (_) => print('Jason disconnect'));
-    socket.onDisconnect((data) => print('Test data ${data}'));
-    socket.on('fromServer', (_) => print(_));
-  }
+  // _MyAppState() {
+  //   print('called');
+
+  //   // socket.on('refresh', (data) => print(data));
+
+  //   // socket.on('connect', (_) {
+  //   //   print('connect');
+  //   //   socket.emit('msg', 'test');
+  //   // });
+  //   // // socket.onConnect((data) => print('Connected'));
+  //   // //socket.connect();
+  //   // socket.onConnecting((data) {
+  //   //   print("Connecting");
+  //   // });
+  //   // socket.on('event', (data) => print(data));
+  //   // // socket.on('disconnect', (_) => print('Jason disconnect'));
+  //   // socket.onDisconnect((data) => print('Test data ${data}'));
+  //   // socket.on('fromServer', (_) => print(_));
+  //   Socket socket = io(
+  //       'http://localhost:5050',
+  //       OptionBuilder()
+  //           .setTransports(['websocket']) // for Flutter or Dart VM
+  //           .disableAutoConnect() // disable auto-connection
+  //           //.setExtraHeaders({'foo': 'bar'}) // optional
+  //           .build());
+  //   socket.connect();
+  //   // socket.onConnect((_) {
+  //   //   print('connect');
+  //   //   socket.emitWithAck('msg', 'init', ack: (data) {
+  //   //     print('ack $data');
+  //   //     if (data != null) {
+  //   //       print('from server $data');
+  //   //     } else {
+  //   //       print("Null");
+  //   //     }
+  //   //   });
+  //   // });
+  // }
 
   void connectToServer() {
     try {
-      IO.Socket socket1 = IO.io('http://localhost:5050', <String, dynamic>{
-        'transports': ['websocket'],
-        'autoConnect': false,
-      });
+      // IO.Socket socket1 = IO.io('http://localhost:5050', <String, dynamic>{
+      //   'transports': ['websocket'],
+      //   'autoConnect': false,
+      // });
+      Socket socket1 = io('http://localhost:5050');
       print('called');
       // Connect to websocket
       socket1.connect();
@@ -92,6 +117,33 @@ class _MyAppState extends State<MyApp> {
     }
   }
 
+  void _listenNewOrderOnSocket() {
+    // Socket socket = io('http://localhost:5050',
+    //     OptionBuilder().setTransports(['websocket']).build());
+    // socket.onConnect((_) {
+    //   print('connect');
+    // });
+    // socket.onError((e) {
+    //   print(e);
+    // });
+    // socket.on('refresh', (data) {
+    //   print(data);
+    //   // var order = (data as Map)['order'];
+    //   // var method = (data as Map)['method'];
+    //   // if (method == "ADD")
+    //   //   context.read<EventBus>().fire(NewOrderEvent(OrderModel.fromMap(order)));
+    // });
+    // socket.onDisconnect((_) => print('disconnect'));
+    Socket socket = io(
+        'http://localhost:5000',
+        OptionBuilder()
+            .setTransports(['websocket']) // for Flutter or Dart VM
+            .disableAutoConnect() // disable auto-connection
+            //.setExtraHeaders({'foo': 'bar'}) // optional
+            .build());
+    socket.connect();
+  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -103,7 +155,7 @@ class _MyAppState extends State<MyApp> {
     // socket.onDisconnect((_) => print('disconnect'));
     // socket.on('fromServer', (_) => print(_));
     // connectAndListen();
-    //connectToServer();
+    _listenNewOrderOnSocket();
     super.initState();
   }
 
@@ -134,8 +186,8 @@ StreamSocket streamSocket = StreamSocket();
 
 //STEP2: Add this function in main function in main.dart file and add incoming data to the stream
 void connectAndListen() {
-  IO.Socket socket = IO.io('http://localhost:5050',
-      IO.OptionBuilder().setTransports(['websocket']).build());
+  Socket socket = io('http://localhost:5050',
+      OptionBuilder().setTransports(['websocket']).build());
   print('called');
 
   socket.onConnect((_) {
